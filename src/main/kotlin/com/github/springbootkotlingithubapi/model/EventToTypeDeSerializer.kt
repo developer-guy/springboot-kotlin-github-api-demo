@@ -1,4 +1,4 @@
-package com.github.springbootkotlingithubapi
+package com.github.springbootkotlingithubapi.model
 
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.DeserializationContext

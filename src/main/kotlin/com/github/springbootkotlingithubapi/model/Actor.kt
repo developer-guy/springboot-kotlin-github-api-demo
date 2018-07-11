@@ -1,6 +1,7 @@
-package com.github.springbootkotlingithubapi
+package com.github.springbootkotlingithubapi.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
+
 
 data class Actor(@JsonProperty("login") val login: String,
                  @JsonProperty("avatar_url") val avatarUrl: String,

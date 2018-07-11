@@ -1,4 +1,4 @@
-package com.github.springbootkotlingithubapi
+package com.github.springbootkotlingithubapi.configuration
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 
@@ -7,6 +7,6 @@ class GithubProperties {
     /*
     *  A token to use Github Public API.
     * */
-    var token: String? = null
+    var token: String = ""
     var rootUri: String? = null
 }

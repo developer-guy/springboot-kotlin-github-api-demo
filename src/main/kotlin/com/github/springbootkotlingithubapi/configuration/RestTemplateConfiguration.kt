@@ -1,4 +1,4 @@
-package com.github.springbootkotlingithubapi
+package com.github.springbootkotlingithubapi.configuration
 
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.context.annotation.Bean
@@ -8,8 +8,8 @@ import org.springframework.http.HttpRequest
 import org.springframework.http.client.ClientHttpRequestExecution
 import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.http.client.ClientHttpResponse
-import org.springframework.util.StringUtils
 import org.springframework.web.client.RestTemplate
+
 
 @Configuration
 class RestTemplateConfiguration {
@@ -22,11 +22,12 @@ class RestTemplateConfiguration {
             .build()
 
 
-    class TokenCheckInterceptor(private val token: String? = null) : ClientHttpRequestInterceptor {
+    class TokenCheckInterceptor constructor(private val token: String) : ClientHttpRequestInterceptor {
 
         override fun intercept(request: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {
-            if (StringUtils.hasText(token)) {
-                request.headers.add(HttpHeaders.AUTHORIZATION, "token $token")
+            if (token.hasText()) {
+                request.headers.add(HttpHeaders.AUTHORIZATION,
+                        "token $token")
             }
 
             return execution.execute(request, body)
@@ -35,3 +36,5 @@ class RestTemplateConfiguration {
     }
 
 }
+
+fun String?.hasText(): Boolean = this != null && this.isNotEmpty() && this.isNotBlank()

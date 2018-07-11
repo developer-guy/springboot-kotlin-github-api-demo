@@ -1,6 +1,8 @@
 package com.github.springbootkotlingithubapi
 
-import org.springframework.boot.CommandLineRunner
+import com.github.springbootkotlingithubapi.configuration.GithubProperties
+import com.github.springbootkotlingithubapi.domain.GithubProject
+import com.github.springbootkotlingithubapi.repository.GithubProjectRepository
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.builder.SpringApplicationBuilder
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -18,14 +20,16 @@ fun main(args: Array<String>) {
             .sources(SpringbootKotlinGithubApiApplication::class.java)
             .initializers(beans {
                 bean {
-                    CommandLineRunner {
-                        val githubProjectRepository = ref<GithubProjectRepository>()
+                    // bean definition
 
-                        Stream.of("spring-projects,spring-boot",
-                                "spring-projects,spring-data-jpa")
-                                .map { it.split(",") }
-                                .forEach { githubProjectRepository.save(GithubProject(orgName = it[0], repoName = it[1])) }
-                    }
+                    val githubProjectRepository = ref<GithubProjectRepository>() // getting bean from context
+
+                    Stream.of("spring-projects,spring-data-jpa",
+                            "spring-projects,spring-boot")
+                            .map { it.split(",") }
+                            .forEach {
+                                githubProjectRepository.save(GithubProject(orgName = it[0], repoName = it[1]))
+                            }
                 }
             })
             .run(*args)

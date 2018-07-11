@@ -1,4 +1,4 @@
-package com.github.springbootkotlingithubapi
+package com.github.springbootkotlingithubapi.model
 
 enum class Type(val type: String) {
     CLOSED("closed"),
