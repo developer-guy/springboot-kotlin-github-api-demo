@@ -15,6 +15,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.support.beans
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.CrudRepository
 import org.springframework.http.HttpHeaders
@@ -24,19 +25,22 @@ import org.springframework.http.client.ClientHttpRequestExecution
 import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.http.client.ClientHttpResponse
 import org.springframework.stereotype.Component
+import org.springframework.stereotype.Controller
+import org.springframework.ui.Model
+import org.springframework.ui.set
 import org.springframework.util.StringUtils
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
 import java.time.OffsetDateTime
 import java.util.stream.Stream
+import java.util.stream.StreamSupport
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.Id
+import kotlin.collections.set
+import kotlin.streams.toList
 
 @SpringBootApplication
 @EnableConfigurationProperties(GithubProperties::class)
@@ -72,12 +76,13 @@ class GithubProperties {
     var rootUri: String? = null
 }
 
-@RestController
+@Controller
 @RequestMapping("/issues")
 class GithubIssuesController(private val githubClient: GithubClient,
                              private val githubProjectRepository: GithubProjectRepository) {
 
     @GetMapping("{orgName}/{repoName}/events")
+    @ResponseBody
     fun findIssueEventsByOrgNameAndRepoName(@PathVariable orgName: String, @PathVariable repoName: String, pageable: Pageable): ResponseEntity<RepositoryEventsList> {
         val githubProject = githubProjectRepository.findByRepoName(repoName)
         return if (githubProject == null) {
@@ -102,8 +107,19 @@ class GithubIssuesController(private val githubClient: GithubClient,
         }
     }
 
+    @GetMapping
+    fun dashboardView(model: Model): String {
+        val entries = StreamSupport.stream(this.githubProjectRepository.findAll().spliterator(), true)
+                .map { DashboardEntry(it, githubClient.fetchEvents(orgName = it.orgName, repoName = it.repoName).body) }.toList()
+
+        model["entries"] = entries
+
+        return "dashboard"
+    }
+
 
 }
+
 
 @RestController
 @RequestMapping("/projects")
@@ -160,7 +176,7 @@ class RepositoryEventsList : MutableList<RepositoryEvent> by ArrayList()
 class GithubClient(val restTemplate: RestTemplate) {
     private val issuesURL = "/repos/{owner}/{repo}/issues/events?page={page}&per_page={per_page}"
 
-    fun fetchEvents(orgName: String?, repoName: String?, pageable: Pageable): ResponseEntity<RepositoryEventsList> {
+    fun fetchEvents(orgName: String?, repoName: String?, pageable: Pageable = PageRequest.of(0, 20)): ResponseEntity<RepositoryEventsList> {
         val uriString = UriComponentsBuilder
                 .fromUriString(issuesURL)
                 .buildAndExpand(mapOf("owner" to orgName, "repo" to repoName, "page" to pageable.pageNumber, "per_page" to pageable.pageSize))
@@ -172,6 +188,7 @@ class GithubClient(val restTemplate: RestTemplate) {
 
 }
 
+
 class EventToTypeDeSerializer(vc: Class<*>?) : StdDeserializer<Type?>(vc) {
 
     override fun deserialize(p0: JsonParser?, p1: DeserializationContext?): Type? {
@@ -180,6 +197,8 @@ class EventToTypeDeSerializer(vc: Class<*>?) : StdDeserializer<Type?>(vc) {
     }
 
 }
+
+data class DashboardEntry(val project: GithubProject, val events: RepositoryEventsList?)
 
 
 data class RepositoryEvent(@JsonProperty("event") @JsonDeserialize(using = EventToTypeDeSerializer::class) val type: Type,
