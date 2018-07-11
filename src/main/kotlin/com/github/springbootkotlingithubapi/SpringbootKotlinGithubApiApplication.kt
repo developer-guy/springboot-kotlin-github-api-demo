@@ -85,6 +85,7 @@ class GithubIssuesController(private val githubClient: GithubClient,
     @ResponseBody
     fun findIssueEventsByOrgNameAndRepoName(@PathVariable orgName: String, @PathVariable repoName: String, pageable: Pageable): ResponseEntity<RepositoryEventsList> {
         val githubProject = githubProjectRepository.findByRepoName(repoName)
+
         return if (githubProject == null) {
             ResponseEntity
                     .notFound()
@@ -159,8 +160,7 @@ class RestTemplateConfiguration {
 
         override fun intercept(request: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {
             if (StringUtils.hasText(token)) {
-                request.headers.add(HttpHeaders.AUTHORIZATION,
-                        "token $token")
+                request.headers.add(HttpHeaders.AUTHORIZATION, "token $token")
             }
 
             return execution.execute(request, body)
