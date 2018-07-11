@@ -21,7 +21,7 @@ import kotlin.streams.toList
 class GithubIssuesController(private val githubClient: GithubClient,
                              private val githubProjectRepository: GithubProjectRepository) {
 
-    @GetMapping("/issues/{repoName}/events")
+    @GetMapping("/issues/{repoName}")
     @ResponseBody
     fun findIssueEventsByOrgNameAndRepoName(@PathVariable repoName: String, pageable: Pageable): ResponseEntity<RepositoryEvents> {
         val githubProject = githubProjectRepository.findByRepoName(repoName)
