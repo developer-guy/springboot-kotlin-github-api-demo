@@ -1,0 +1,12 @@
+package com.github.springbootkotlingithubapi
+
+import org.springframework.boot.context.properties.ConfigurationProperties
+
+@ConfigurationProperties(prefix = "github")
+class GithubProperties {
+    /*
+    *  A token to use Github Public API.
+    * */
+    var token: String? = null
+    var rootUri: String? = null
+}
