@@ -22,7 +22,7 @@ class RestTemplateConfiguration {
             .build()
 
 
-    class TokenCheckInterceptor constructor(private val token: String) : ClientHttpRequestInterceptor {
+    class TokenCheckInterceptor constructor(private val token: String?) : ClientHttpRequestInterceptor {
 
         override fun intercept(request: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {
             if (token.hasText()) {
@@ -37,4 +37,5 @@ class RestTemplateConfiguration {
 
 }
 
+//extension function
 fun String?.hasText(): Boolean = this != null && this.isNotEmpty() && this.isNotBlank()

@@ -8,7 +8,7 @@ import javax.persistence.Id
 
 @Entity
 data class GithubProject constructor( //constructor is optional!!
-        val orgName: String? = null,
         @Column(unique = true) val repoName: String? = null,
+        val orgName: String? = null,
         @Id @GeneratedValue val id: Long? = null
 )

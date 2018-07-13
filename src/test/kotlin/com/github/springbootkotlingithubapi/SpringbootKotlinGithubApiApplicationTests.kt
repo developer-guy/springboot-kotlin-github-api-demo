@@ -10,7 +10,7 @@ import org.springframework.test.context.junit4.SpringRunner
 class SpringbootKotlinGithubApiApplicationTests {
 
 	@Test
-	fun contextLoads() {
+	fun `This application's context should successfully load ❤️`() {
 	}
 
 }

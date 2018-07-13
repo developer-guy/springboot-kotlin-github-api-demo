@@ -26,7 +26,7 @@ enum class Type(val type: String) {
 
     companion object {
         fun of(type: String): Type? = enumValues<Type>()
-                .filter { it.type == type }
+                .filter { it.type.toUpperCase() == type.toUpperCase() }
                 .singleOrNull()
     }
 }

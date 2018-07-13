@@ -1,7 +1,6 @@
 package com.github.springbootkotlingithubapi.client
 
 import com.github.springbootkotlingithubapi.model.RepositoryEvents
-import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
@@ -15,7 +14,8 @@ class GithubClient(val restTemplate: RestTemplate) {
 
     fun fetchEvents(orgName: String?,
                     repoName: String?,
-                    pageable: Pageable = PageRequest.of(0, 20)): ResponseEntity<RepositoryEvents> {
+                    pageable: Pageable): ResponseEntity<RepositoryEvents> {
+
         val uriVariables = mapOf("owner" to orgName,
                 "repo" to repoName,
                 "page" to pageable.pageNumber,
