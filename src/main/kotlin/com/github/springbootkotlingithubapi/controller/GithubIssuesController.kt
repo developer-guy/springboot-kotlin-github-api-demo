@@ -51,9 +51,9 @@ class GithubIssuesController(private val githubClient: GithubClient,
 
     @GetMapping(value = ["/", "/issues/dashboard"])
     fun dashboardView(model: Model): String {
-        val entries = StreamSupport
-                .stream(this.githubProjectRepository.findAll().spliterator(), true)
-                .map { DashboardEntry(it, githubClient.fetchEvents(orgName = it.orgName, repoName = it.repoName).body) }.toList()
+        val entries = StreamSupport.stream(this.githubProjectRepository.findAll().spliterator(), true)
+                .map { DashboardEntry(it, githubClient.fetchEvents(orgName = it.orgName, repoName = it.repoName).body) }
+                .toList()
 
         model["entries"] = entries
 
