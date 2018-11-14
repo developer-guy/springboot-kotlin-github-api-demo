@@ -2,7 +2,7 @@ package com.github.springbootkotlingithubapi.controller
 
 import com.github.springbootkotlingithubapi.client.GithubClient
 import com.github.springbootkotlingithubapi.model.DashboardEntry
-import com.github.springbootkotlingithubapi.model.RepositoryEvents
+import com.github.springbootkotlingithubapi.model.RepositoryEvent
 import com.github.springbootkotlingithubapi.repository.GithubProjectRepository
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpHeaders
@@ -12,7 +12,10 @@ import org.springframework.ui.Model
 import org.springframework.ui.set
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseBody
+import org.springframework.web.servlet.ModelAndView
+import org.springframework.web.servlet.view.RedirectView
 import java.util.stream.StreamSupport
 import kotlin.collections.set
 import kotlin.streams.toList
@@ -24,7 +27,7 @@ class GithubIssuesController(private val githubClient: GithubClient,
 
     @GetMapping("/issues/{repoName}")
     @ResponseBody
-    fun findIssueEventsByOrgNameAndRepoName(@PathVariable repoName: String, pageable: Pageable): ResponseEntity<RepositoryEvents> {
+    fun findIssueEventsByOrgNameAndRepoName(@PathVariable repoName: String, pageable: Pageable?): ResponseEntity<List<RepositoryEvent>> {
         val githubProject = githubProjectRepository.findByRepoName(repoName)
 
         return if (githubProject == null) {
@@ -49,15 +52,18 @@ class GithubIssuesController(private val githubClient: GithubClient,
         }
     }
 
-    @GetMapping(value = ["/", "/issues/dashboard"])
-    fun dashboardView(model: Model): String {
+    @RequestMapping(value = ["/", "/issues/dashboard"])
+    fun goTodashboardView(model: Model): ModelAndView {
         val entries = StreamSupport.stream(this.githubProjectRepository.findAll().spliterator(), true)
                 .map { DashboardEntry(it, githubClient.fetchEvents(orgName = it.orgName, repoName = it.repoName).body) }
                 .toList()
 
         model["entries"] = entries
 
-        return "dashboard"
-    }
+        return ModelAndView(
+                RedirectView("/dashboard", true),
+                model.asMap()
+        )
 
+    }
 }

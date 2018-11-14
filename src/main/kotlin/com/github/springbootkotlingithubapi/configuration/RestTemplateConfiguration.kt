@@ -1,5 +1,6 @@
 package com.github.springbootkotlingithubapi.configuration
 
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -12,6 +13,7 @@ import org.springframework.web.client.RestTemplate
 
 
 @Configuration
+@EnableConfigurationProperties(GithubProperties::class)
 class RestTemplateConfiguration {
 
     @Bean
@@ -26,15 +28,17 @@ class RestTemplateConfiguration {
 
         override fun intercept(request: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {
             if (token.hasText()) {
-                request.headers.add(HttpHeaders.AUTHORIZATION,
-                        "token $token")
+                request.addToken2RequestHeaders(token)
             }
-
             return execution.execute(request, body)
         }
 
     }
 
+}
+
+fun HttpRequest.addToken2RequestHeaders(token: String?) {
+    this.headers.add(HttpHeaders.AUTHORIZATION, "token $token")
 }
 
 //extension function

@@ -1,7 +1,6 @@
 package com.github.springbootkotlingithubapi.client
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.github.springbootkotlingithubapi.configuration.GithubProperties
 import com.github.springbootkotlingithubapi.configuration.RestTemplateConfiguration
 import com.github.springbootkotlingithubapi.model.*
 import org.assertj.core.api.Assertions.assertThat
@@ -10,7 +9,6 @@ import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -38,12 +36,9 @@ class GithubClientTest {
     @Autowired
     lateinit var objectMapper: ObjectMapper
 
-    @MockBean
-    lateinit var githubProperties: GithubProperties
-
     @Test
-    fun `This client should fetch issues from Github API 😎`() {
-        //ARRANGE
+    fun `It should fetch issues from Github API 😎`() {
+        //Arrange
         val repositoryEvent = RepositoryEvent(
                 Type.ASSIGNED,
                 OffsetDateTime.now(),
@@ -51,7 +46,7 @@ class GithubClientTest {
                 Issue("test_issue_html.url", 0, "test_title")
         )
 
-        val repositoryEvents = RepositoryEvents().initializeWith(repositoryEvent)
+        val repositoryEvents = RepositoryEvents().addOthers(repositoryEvent)
 
         val bodyAsJSON = objectMapper.writeValueAsString(repositoryEvents)
 
@@ -59,12 +54,12 @@ class GithubClientTest {
                 .requestTo("/repos/spring-projects/spring-data-jpa/issues/events?page=0&per_page=20"))
                 .andRespond(MockRestResponseCreators.withSuccess(bodyAsJSON, MediaType.APPLICATION_JSON_UTF8))
 
-        //ACT
+        //Act
         val response: ResponseEntity<RepositoryEvents> = githubClient.fetchEvents("spring-projects",
                 "spring-data-jpa",
                 PageRequest.of(0, 20, Sort.Direction.ASC, "id"))
 
-        //ASSERT
+        //Assert
         assertThat(response.statusCode.is2xxSuccessful).isTrue()
         assertThat(response.body?.size).isEqualTo(1)
         assertThat(response.body!![0].type).isEqualTo(Type.ASSIGNED)
@@ -72,7 +67,7 @@ class GithubClientTest {
 
 }
 
-fun RepositoryEvents.initializeWith(vararg others: RepositoryEvent): RepositoryEvents {
+fun RepositoryEvents.addOthers(vararg others: RepositoryEvent): RepositoryEvents {
     others.forEach { this.add(it) }
     return this
 }

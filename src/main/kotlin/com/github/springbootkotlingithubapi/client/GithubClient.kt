@@ -7,6 +7,7 @@ import org.springframework.data.domain.Sort
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
+import org.springframework.web.client.getForEntity
 import org.springframework.web.util.UriComponentsBuilder
 
 
@@ -28,8 +29,7 @@ class GithubClient(val restTemplate: RestTemplate) {
                 .buildAndExpand(uriVariables)
                 .toUriString()
 
-
-        return restTemplate.getForEntity(uriString, RepositoryEvents::class.java)
+        return restTemplate.getForEntity(uriString, RepositoryEvents::class)
     }
 
 }

@@ -1,0 +1,16 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate.dialect: org.hibernate.dialect.MySQL5Dialect
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/github_demo?useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+
+github:
+  root-uri: https://api.github.com
+  token: ${GITHUB_TOKEN}
