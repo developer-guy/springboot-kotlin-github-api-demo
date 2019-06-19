@@ -5,6 +5,7 @@ import com.github.springbootkotlingithubapi.repository.GithubProjectRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
 import org.springframework.stereotype.Component
+import java.util.*
 import java.util.stream.Stream
 
 @Component
@@ -18,7 +19,19 @@ class DataLoaderRunner : CommandLineRunner {
     override fun run(vararg args: String?) {
         Stream.of(*organizationRepos)
                 .map { it.split(",") }
-                .map {githubProjectRepository.save(GithubProject(orgName = it[0], repoName = it[1])) }
-                .forEach(::println)
+                .forEach {
+                    val orgName = it[0]
+                    val repoName = it[1]
+                    val project: GithubProject? = githubProjectRepository.findByRepoName(repoName = repoName)
+                    project whenNull {
+                        githubProjectRepository.save(GithubProject(orgName = orgName, repoName = repoName))
+                    }
+                }
+    }
+}
+
+infix fun Any?.whenNull(callback: () -> Unit) {
+    if (Objects.isNull(this)) {
+        callback.invoke()
     }
 }

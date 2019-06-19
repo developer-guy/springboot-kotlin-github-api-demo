@@ -8,8 +8,8 @@ spring:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://localhost:3306/github_demo?useSSL=false&allowPublicKeyRetrieval=true
-    username: root
-    password: root
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 
 github:
   root-uri: https://api.github.com
