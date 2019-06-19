@@ -8,9 +8,9 @@ spring:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://localhost:3306/github_demo?useSSL=false&allowPublicKeyRetrieval=true
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    username: ${DB_USERNAME:admin}
+    password: ${DB_PASSWORD:admin}
 
 github:
   root-uri: https://api.github.com
-  token: ${GITHUB_TOKEN}
+  token: ${GITHUB_TOKEN:token}
